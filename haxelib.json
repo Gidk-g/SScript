@@ -1,14 +1,13 @@
 {
   "name": "SScript",
-  "url": "https://github.com/TahirRollingArch/SScript",
+  "url": "https://github.com/TheWorldMachinima/SScript",
   "license": "Apache",
-  "tags": ["hscript"],
+  "tags": ["hscript", "sscript", "haxescript"],
   "description": "An easy-to-use Haxe Script class for all targets.",
-  "version": "0.1.1",
+  "version": "3.0.0",
   "classPath": "src/",
-  "releasenote": "Fixes for Linux and Mac.",
-  "contributors": ["TahirRollingArch"],
+  "releasenote": "Nonstatic targets + OpenFL Support",
+  "contributors": ["TheWorldMachinima", "TahirRollingArch"],
   "dependencies": {
-    
   }
 }

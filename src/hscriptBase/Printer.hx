@@ -19,8 +19,8 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  * DEALINGS IN THE SOFTWARE.
  */
-package hscript;
-import hscript.Expr;
+package hscriptBase;
+import hscriptBase.Expr;
 
 class Printer {
 
@@ -333,7 +333,7 @@ class Printer {
 	public static function errorToString( e : Expr.Error ) {
 		var message = switch( #if hscriptPos e.e #else e #end ) {
 			case EInvalidChar(c): "Invalid character: '"+(StringTools.isEof(c) ? "EOF" : String.fromCharCode(c))+"' ("+c+")";
-			case EUnexpected(s): "Unexpected token: \""+s+"\"";
+			case EUnexpected(s): "Unexpected \""+s+"\"";
 			case EUnterminatedString: "Unterminated string";
 			case EUnterminatedComment: "Unterminated comment";
 			case EInvalidPreprocessor(str): "Invalid preprocessor (" + str + ")";
@@ -342,6 +342,14 @@ class Printer {
 			case EInvalidOp(op): "Invalid operator: "+op;
 			case EInvalidAccess(f): "Invalid access to field " + f;
 			case ECustom(msg): msg;
+			case EInvalidFinal(v): "You cannot reassign a value to the final variable " + "\"" + v + "\"" + ".";
+			case EUnmatcingType(v,t): t + " should be " + v + ".";
+			case EUnexistingField(f,f2): "Field " + f2 + " does not exist in " + f + ".";
+			case EUnknownIdentifier(v): "Unknown identifier: "  + v + ".";
+			case EUpperCase: "Package name cannot have capital letters.";
+			case EDuplicate(v): "Duplicate class field declaration (" + v + ").";
+			case EExpectedField(v): "Expected \"public\" or \"private\" for " + v + ", couldn't get any.";
+			case EFunctionAssign(f): "Cannot rebind this method (" + f + ") : please use 'dynamic' before method declaration";
 		};
 		#if hscriptPos
 		return e.origin + ":" + e.line + ": " + message;

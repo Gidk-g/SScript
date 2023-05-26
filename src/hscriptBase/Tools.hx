@@ -19,10 +19,18 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  * DEALINGS IN THE SOFTWARE.
  */
-package hscript;
-import hscript.Expr;
+package hscriptBase;
+import hscriptBase.Expr;
+
+using StringTools;
 
 class Tools {
+	public static var keys:Array<String> = [
+		"import", "package", "if", "var", "for", "while", "final", "do", "as", "using", "break", "continue",
+		"public", "private", "static", "overload", "override", "class", "function", "else", "try", "catch",
+		"abstract", "case", "switch", "untyped", "cast", "typedef", "dynamic", "default", "enum", "extern",
+		"extends", "implements", "in", "macro", "new", "null", "return", "throw", "from", "to", "super"
+	];
 
 	public static function iter( e : Expr, f : Expr -> Void ) {
 		switch( expr(e) ) {
@@ -92,6 +100,60 @@ class Tools {
 		return mk(edef, e);
 	}
 
+	public static function getIdent( e : Expr ) : String {
+		return switch (expr(e)) {
+			case EIdent(v): v;
+			case EField(e,f): getIdent(e);
+			case EArray(e,i): getIdent(e);
+			default: null;
+		}
+	}
+
+	public static function ctToType( ct : CType ):String {
+		var ctToType:(ct:CType)->String = function(ct)
+		{
+			return switch (cast(ct, CType)){
+				case CTPath(path, params): switch path[0]{
+					case 'Null': return ctToType(params[0]);
+				} path[0];
+				case CTFun(_,_)|CTParent(_):"Function";
+				case CTAnon(fields): "Anon";
+				default: null;
+			}
+		};
+		return ctToType(ct);
+	}
+
+	public static function compatibleWithEachOther(v,v2):Bool{
+		var chance:Bool = v=="Float"&&v2=="Int";
+		var secondChance:Bool = v=="Dynamic"||v2=="null";
+		return chance||secondChance;
+	}
+
+	public static function getType( v ) {
+		var getType:(s:Dynamic)->String = function(v){
+			return switch(Type.typeof(v)) {
+				case TNull: "null";
+				case TInt: "Int";
+				case TFloat: "Float";
+				case TBool: "Bool";  
+				case TClass(v): var name = Type.getClassName(v);
+				if(name.contains('.'))
+				{
+					var split = name.split('.');
+					name = split[split.length - 1];
+				}
+				switch (name){
+					
+				}
+				name;
+				case TFunction: "Function";
+				default: var string = "" + Type.typeof(v) + ""; string.replace("T","");
+			}
+		};
+		return getType(v);
+	}
+
 	public static inline function expr( e : Expr ) : ExprDef {
 		#if hscriptPos
 		return e.e;
@@ -100,9 +162,9 @@ class Tools {
 		#end
 	}
 
-	public static inline function mk( e : ExprDef, p : Expr ) {
+	public static inline function mk( e : ExprDef, p : Expr ) : Expr {
 		#if hscriptPos
-		return { e : e, pmin : p.pmin, pmax : p.pmax, origin : p.origin, line : p.line };
+		return cast { e : e, pmin : p.pmin, pmax : p.pmax, origin : p.origin, line : p.line };
 		#else
 		return e;
 		#end
